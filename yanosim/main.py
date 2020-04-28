@@ -17,6 +17,12 @@ def yanosim():
 @click.option('-o', '--output-fn', required=True)
 @click.option('-p', '--processes', default=4)
 def model(bam_fn, output_fn, processes):
+    '''
+    Creates an model of mismatches, insertions and deletions based on
+    an alignment of nanopore DRS reads to a reference. Reads should
+    be aligned to a transcriptome i.e. without spliced alignment, using
+    minimap2. They should have the cs tag.
+    '''
     basecall_model, homopolymer_model, frag_model = parallel_build_prob_tree(
         bam_fn, processes=processes
     )
@@ -30,6 +36,10 @@ def model(bam_fn, output_fn, processes):
 @click.option('-f', '--filtered-gtf-output-fn', required=False)
 @click.option('-r', '--remove-ensembl-version', default=False, is_flag=True)
 def quantify(bam_fn, output_fn, gtf_fn, filtered_gtf_output_fn, remove_ensembl_version):
+    '''
+    Quantify the number of reads mapping to each transcript in a reference, so that
+    the right number of reads can be simulated.
+    '''
     if gtf_fn and not filtered_gtf_output_fn:
         raise click.BadParameter('If -g is specified, must also provide -f')
     expressed = set()
@@ -64,6 +74,10 @@ def quantify(bam_fn, output_fn, gtf_fn, filtered_gtf_output_fn, remove_ensembl_v
 @click.option('-p', '--processes', default=4)
 @click.option('-s', '--seed', default=None, type=int)
 def simulate(fasta_fn, model_fn, quantification_fn, output_fn, model_frag, processes, seed):
+    '''
+    Given a model created using yanosim model, and per-transcript read counts created using
+    yanosim simulate, simulate error-prone long-reads from the given fasta file.
+    '''
     basecall_model, homopolymer_model, fragmentation_model = load_model(model_fn)
     if seed is not None:
         np.random.seed(seed)
@@ -75,7 +89,7 @@ def simulate(fasta_fn, model_fn, quantification_fn, output_fn, model_frag, proce
             frag_model=fragmentation_model,
             model_frag=model_frag,
             polya_len=10,
-            five_prime_loss=True,
+            five_prime_loss=False,
             chunk_size=1000,
         )
         for read_id, seq in sim_reads:

@@ -61,7 +61,7 @@ def random_fragment(ref_seq, frag_model):
 
 
 def simulate_read(ref_seq, *, basecall_ptree, hp_ptree, frag_model,
-                  model_frag=True, polya_len=10, five_prime_loss=True):
+                  model_frag=True, polya_len=10, five_prime_loss=False):
     if polya_len:
         ref_seq = ref_seq + 'A' * polya_len
 
@@ -100,6 +100,9 @@ def get_reads(fasta_fn, quantification_fn, chunk_size=10_000):
             if len(chunk) == chunk_size:
                 yield chunk
                 chunk = []
+        else:
+            if len(chunk):
+                yield chunk
 
 
 def _imap_simulate(chunk, **sim_kwargs):
