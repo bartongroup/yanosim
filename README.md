@@ -1,5 +1,7 @@
 # Yanosim (yet another nanopore simulator)
 
+[![yanosim](https://zenodo.org/badge/DOI/10.5281/zenodo.3778852.svg)](https://zenodo.org/record/3778852)
+
 Read simulator for nanopore DRS datasets.
 
 ## Installation:
